@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notenverwaltung</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Menu Bar -->
+<div class="menubar">
+  <div class="menubar-left">
+    <span class="menubar-logo">🎓 Notenverwaltung</span>
+  </div>
+  <div class="menubar-right">
+    <span id="menubar-date"></span>
+  </div>
+</div>
+
+<!-- Desktop -->
+<div class="desktop" id="desktop">
+
+  <div class="widgets-grid">
+    <!-- Gesamtschnitt Widget -->
+    <div class="widget glass" id="widget-overall">
+      <div class="widget-title">Gesamtschnitt</div>
+      <div class="widget-value" id="overall-average">–</div>
+      <div class="widget-sub">Promotionswirksame Fächer</div>
+    </div>
+
+    <!-- Fächerübersicht Widget -->
+    <div class="widget glass widget-wide" id="widget-subjects">
+      <div class="widget-title">Fächerübersicht</div>
+      <div class="table-wrap">
+        <table id="subjects-overview-table">
+          <thead>
+            <tr>
+              <th>Fach</th>
+              <th>Kürzel</th>
+              <th>Schnitt</th>
+              <th>Zeugnisnote</th>
+              <th>Anzahl Noten</th>
+            </tr>
+          </thead>
+          <tbody id="subjects-overview-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Dock -->
+<div class="dock-wrap">
+  <div class="dock glass" id="dock">
+    <button class="dock-item" data-window="win-grades" title="Note erfassen">
+      <span class="icon-box icon-noten">✎</span><span class="dock-label">Noten</span>
+    </button>
+    <button class="dock-item" data-window="win-subjects" title="Fächer verwalten">
+      <span class="icon-box icon-faecher">📚</span><span class="dock-label">Fächer</span>
+    </button>
+    <button class="dock-item" data-window="win-examtypes" title="Prüfungsarten">
+      <span class="icon-box icon-pruefung">🗂</span><span class="dock-label">Prüfungsarten</span>
+    </button>
+    <button class="dock-item" data-window="win-charts" title="Diagramme">
+      <span class="icon-box icon-diagramme">📈</span><span class="dock-label">Diagramme</span>
+    </button>
+    <button class="dock-item" data-window="win-backup" title="Backup">
+      <span class="icon-box icon-backup">☁︎</span><span class="dock-label">Backup</span>
+    </button>
+  </div>
+</div>
+
+<!-- WINDOW: Noten erfassen -->
+<div class="window glass" id="win-grades" data-title="Noten erfassen">
+  <div class="window-titlebar">
+    <div class="traffic-lights">
+      <span class="tl tl-close" data-close></span>
+      <span class="tl tl-min"></span>
+      <span class="tl tl-max"></span>
+    </div>
+    <div class="window-title">Note erfassen</div>
+  </div>
+  <div class="window-body">
+    <form id="grade-form" class="form-grid">
+      <input type="hidden" id="grade-edit-id">
+      <label>
+        Fach
+        <select id="grade-fach" required></select>
+      </label>
+      <label>
+        Prüfungsart
+        <select id="grade-art" required></select>
+      </label>
+      <label>
+        Note
+        <input type="number" id="grade-note" min="1" max="6" step="0.1" inputmode="decimal" placeholder="z.B. 5.5" required>
+      </label>
+      <label>
+        Gewichtung
+        <input type="number" id="grade-gewicht" min="0.1" step="0.1" value="1" inputmode="decimal" required>
+      </label>
+      <label>
+        Datum
+        <input type="date" id="grade-datum" required>
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="grade-submit-btn">Note speichern</button>
+        <button type="button" class="btn btn-secondary" id="grade-cancel-edit" style="display:none">Abbrechen</button>
+      </div>
+    </form>
+
+    <hr class="divider">
+
+    <h3 class="section-title">Alle Noten</h3>
+    <div class="table-wrap">
+      <table id="grades-table">
+        <thead>
+          <tr>
+            <th>Fach</th>
+            <th>Art</th>
+            <th>Note</th>
+            <th>Gewicht</th>
+            <th>Datum</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="grades-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- WINDOW: Fächer verwalten -->
+<div class="window glass" id="win-subjects" data-title="Fächer verwalten">
+  <div class="window-titlebar">
+    <div class="traffic-lights">
+      <span class="tl tl-close" data-close></span>
+      <span class="tl tl-min"></span>
+      <span class="tl tl-max"></span>
+    </div>
+    <div class="window-title">Fächer verwalten</div>
+  </div>
+  <div class="window-body">
+    <form id="subject-form" class="form-grid">
+      <input type="hidden" id="subject-edit-id">
+      <label>
+        Name
+        <input type="text" id="subject-name" required placeholder="z.B. Mathematik">
+      </label>
+      <label>
+        Kürzel (2 Buchstaben)
+        <input type="text" id="subject-kuerzel" required maxlength="2" minlength="2" placeholder="z.B. MA" style="text-transform:uppercase">
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="subject-promo" checked>
+        Promotionswirksam
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="subject-submit-btn">Fach hinzufügen</button>
+        <button type="button" class="btn btn-secondary" id="subject-cancel-edit" style="display:none">Abbrechen</button>
+      </div>
+    </form>
+
+    <hr class="divider">
+
+    <div class="table-wrap">
+      <table id="subjects-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Kürzel</th>
+            <th>Promotionswirksam</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="subjects-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- WINDOW: Prüfungsarten -->
+<div class="window glass" id="win-examtypes" data-title="Prüfungsarten">
+  <div class="window-titlebar">
+    <div class="traffic-lights">
+      <span class="tl tl-close" data-close></span>
+      <span class="tl tl-min"></span>
+      <span class="tl tl-max"></span>
+    </div>
+    <div class="window-title">Prüfungsarten verwalten</div>
+  </div>
+  <div class="window-body">
+    <form id="examtype-form" class="form-grid">
+      <label>
+        Bezeichnung
+        <input type="text" id="examtype-name" required placeholder="z.B. Schriftlich">
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Hinzufügen</button>
+      </div>
+    </form>
+    <hr class="divider">
+    <ul class="simple-list" id="examtypes-list"></ul>
+  </div>
+</div>
+
+<!-- WINDOW: Diagramme -->
+<div class="window glass window-large" id="win-charts" data-title="Diagramme">
+  <div class="window-titlebar">
+    <div class="traffic-lights">
+      <span class="tl tl-close" data-close></span>
+      <span class="tl tl-min"></span>
+      <span class="tl tl-max"></span>
+    </div>
+    <div class="window-title">Diagramme</div>
+  </div>
+  <div class="window-body">
+
+    <h3 class="section-title">Notenverlauf – alle Fächer im Vergleich</h3>
+    <canvas id="chart-all-subjects" width="640" height="280"></canvas>
+    <div class="chart-legend" id="chart-all-legend"></div>
+
+    <hr class="divider">
+
+    <label>
+      Fach für Notenverlauf im Detail
+      <select id="chart-subject-select"></select>
+    </label>
+
+    <h3 class="section-title">Notenverlauf</h3>
+    <canvas id="chart-history" width="640" height="280"></canvas>
+  </div>
+</div>
+
+<!-- WINDOW: Fach-Detail (dynamisch) -->
+<div class="window glass" id="win-subject-detail" data-title="Fach Detail">
+  <div class="window-titlebar">
+    <div class="traffic-lights">
+      <span class="tl tl-close" data-close></span>
+      <span class="tl tl-min"></span>
+      <span class="tl tl-max"></span>
+    </div>
+    <div class="window-title" id="subject-detail-title">Fach Detail</div>
+  </div>
+  <div class="window-body" id="subject-detail-body">
+    <!-- dynamisch gefüllt -->
+  </div>
+</div>
+
+<!-- WINDOW: Backup -->
+<div class="window glass" id="win-backup" data-title="Backup">
+  <div class="window-titlebar">
+    <div class="traffic-lights">
+      <span class="tl tl-close" data-close></span>
+      <span class="tl tl-min"></span>
+      <span class="tl tl-max"></span>
+    </div>
+    <div class="window-title">Backup / Import / Export</div>
+  </div>
+  <div class="window-body">
+    <p class="hint">Exportiere alle deine Daten (Fächer, Prüfungsarten, Noten) als JSON-Datei oder importiere ein vorhandenes Backup.</p>
+    <div class="form-actions">
+      <button class="btn btn-primary" id="export-btn">⬇️ Als JSON exportieren</button>
+      <label class="btn btn-secondary file-label">
+        ⬆️ JSON importieren
+        <input type="file" id="import-file" accept="application/json" hidden>
+      </label>
+      <button class="btn btn-danger" id="reset-btn">🗑️ Alle Daten löschen</button>
+    </div>
+    <p class="hint warn">Achtung: Der Import überschreibt alle aktuell gespeicherten Daten.</p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
